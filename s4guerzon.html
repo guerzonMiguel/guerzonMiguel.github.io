@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best of Amigos Restaurant Guide</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-image: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .container-fluid {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(132, 133, 145, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #000000;
+        }
+
+        h1, h2 {
+            font-family: cursive; 
+            color: #744600;
+            margin-bottom: 5px;
+        }
+
+        h1 {
+            color: #744600;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            color: #744600;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #744600;
+            font-size: 0.9em;
+        }
+
+        .restaurant-menu {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .restaurant-item {
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+            background-color: #fff;
+        }
+
+        .restaurant-item:hover {
+            transform: scale(1.02);
+        }
+
+        .restaurant-item img {
+            width: 100%;
+            display: block;
+            height: auto;
+        }
+
+        .restaurant-item h3 {
+            padding: 10px;
+            margin: 0;
+            background-color: #f9f9f9;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        .main-menu-button {
+            text-align: center;
+        }
+
+        .btn {
+            background-color: #47515b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            color: #333;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #restaurantInfo {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <header>
+            <h1>BEST OF AMIGOS</h1>
+            <h2>RESTAURANT GUIDE</h2>
+            <p>PRODUCED BY: JUAN MIGUEL GUERZON</p>
+        </header>
+
+        <div class="restaurant-menu">
+            <div class="restaurant-item" data-restaurant="seafood-boil">
+                <img src="seafood.jpg" alt="Seafood Boil">
+                <h3>Seafood Boil</h3>
+            </div>
+            <div class="restaurant-item" data-restaurant="oyster-platter">
+                <img src="oysterplatter.jpg" alt="Oyster Platter">
+                <h3>Oyster Platter</h3>
+            </div>
+            <div class="restaurant-item" data-restaurant="baked-tahong">
+                <img src="bakedtahong.webp" alt="Baked Tahong">
+                <h3>Baked Tahong</h3>
+            </div>
+            <div class="restaurant-item" data-restaurant="grilled-octopus">
+                <img src="grilledoctopus.webp" alt="Grilled Octopus">
+                <h3>Grilled Octopus</h3>
+            </div>
+        </div>
+
+        <div class="main-menu-button">
+            <button id="mainMenuBtn" class="btn">MAIN MENU</button>
+        </div>
+
+        <div id="restaurantDetails" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <div id="restaurantInfo">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const restaurantItems = document.querySelectorAll('.restaurant-item');
+            const mainMenuBtn = document.getElementById('mainMenuBtn');
+            const modal = document.getElementById('restaurantDetails');
+            const closeButton = document.querySelector('.close-button');
+            const restaurantInfo = document.getElementById('restaurantInfo');
+
+            restaurantItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const restaurantName = this.dataset.restaurant;
+                    loadRestaurantDetails(restaurantName);
+                    modal.style.display = "block";
+                });
+            });
+
+            mainMenuBtn.addEventListener('click', function() {
+                modal.style.display = "none";
+            });
+
+            closeButton.addEventListener('click', function() {
+                modal.style.display = "none";
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            function loadRestaurantDetails(name) {
+                let details = '';
+                switch (name) {
+                    case 'seafood-boil':
+                        details = `
+                            <h2>Seafood Boil</h2>
+                            <p>Steamed or boiled crabs, shrimps and mussels in Cajun-style blend of signature seasonings and spices served in a bag to preserve the flavor.</p>
+                            <p><strong>Specialties:</strong> Signature dish, expertly crafted main course.</p>
+                        `;
+                        break;
+                    case 'oyster-platter':
+                        details = `
+                            <h2>Oyster Platter</h2>
+                            <p>Our freshly shucked oysters, often served on a bed of ice or rock salt, and accompanied by lemon wedges, mignonette, and other condiments, ready for immediate consumption. </p>
+                            <p><strong>Must-try:</strong> A must try if you are a foodie trying to experience new taste of food.</p>
+                        `;
+                        break;
+                    case 'baked-tahong':
+                        details = `
+                            <h2>Baked Tahong</h2>
+                            <p>A simple recipe of baked mussels stuffed with garlic-bechamel sauce and oozing with melted cheese. A sumptuous appetizer that is very budget friendly.</p>
+                            <p><strong>Highlights:</strong> New twist for mussels.</p>
+                        `;
+                        break;
+                    case 'grilled-octopus':
+                        details = `
+                            <h2>Grilled Octopus</h2>
+                            <p>Tender octopus is given a slight smokey flavor from grilling. The combination of fresh, crisp vegetables and a light dressing, created the most perfect Grilled Octopus Salad. It’s easier than you may think to prepare and loads of fun!</p>
+                            <p><strong>Protein Goals Check:</strong> A good a healthy source of protein</p>
+                        `;
+                        break;
+                    default:
+                        details = '<p>No information available for this restaurant.</p>';
+                }
+                restaurantInfo.innerHTML = details;
+            }
+        });
+    </script>
+</body>
+</html>
